@@ -190,7 +190,7 @@ with open(r'C:\Users\melan\Desktop\COLLEGE\YR 4\Final Project\Data\storms_2015-2
             storms.append('')
             curr_time = curr_time + timedelta(hours=1)
         # Fill in storm name until storm has passed
-        while(end_date > curr_time):
+        while(end_date >= curr_time):
             storms.append(row[2])
             curr_time = curr_time + timedelta(hours=1)
     csv_file.close()
