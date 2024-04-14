@@ -1,30 +1,29 @@
-# This script is to generate a single spreadsheet containing all data which will be used in this project, both input and output, by parsing through raw data and selecting related data at a set frequency. 
-# The inputs are:
-# - Date & Time
-# - Atmospheric Pressure - m2
-# - Sea pressure - airport
-# - Water Temperature - m2
-# - Air Temerature (to be dismissed if irrelevant) - airport/m2
-# - Wind Speed - m2
-# - Wind Direction (deg) ((potential to be converted to NSEW)) - m2
-# - Wave Height - m2
-# - Precipitation - airport
-# - Moon Fullness
-# 
-# The outputs are:
-# - Actual tide height
-# - Predicted tide height
-# - Difference
-# - Bool flag 'serious' case
+"""
+This script opens and parses through CSV files containing various measurements. Additional parameters are calculated and all relevant parameters are written to one CSV file. 
 
+Collected parameters from file M2 are:
+- atmospheric pressure
+- air temperature
+- wind speed
+- wind direction
+- wave height
+- wave period
 
+Collected parameters from file Dublin Airport are:
+- precipitation
+
+Collected parameters from file Dublin Tide gauge are:
+- date & time
+- actual tidal height
+
+""" 
 import csv
 from datetime import datetime, timedelta
+import ephem
 
 ######################################
 ## ------ MOON FUNCTION BEGIN------ ##
 ## CREDIT :: https://stackoverflow.com/questions/2526815/moon-lunar-phase-algorithm
-import ephem
 
 def get_phase_on_day(date: datetime):
   """Returns a floating-point number from 0-1. where 0=new, 0.5=full, 1=new"""
@@ -49,14 +48,11 @@ def get_phase_on_day(date: datetime):
   #percentage of the moon which is illuminated. This is not really what we want.
 
   return lunation
-# NOTE ephem uses UTC which is GMT without daylight savings so currently (Feb) GMT and UTC are same. may need to take this into account or justify ignoring it for it not being that big a deal hour by hour
 ## ------ MOON FUNCTION END------ ##
 ####################################
 
 
 
-# Setting value for which tide behaviour is considered serious. If the diffence in predicted and actual tide is greater than this value, this is considered a serious case.
-serious = 1 # meters
 # -----------------------------------------------------------------------------
 #                               Gathering data
 # -----------------------------------------------------------------------------
@@ -205,7 +201,7 @@ difference = []
 serious_case = []
 for act, pred in zip(act_height, pred_height):
     # Parameter 'diff' gives the difference such that a negative value indicates a smaller 
-    # than predicted actaul tide height around the normal and opposite for positive values.
+    # than predicted actual tide height around the normal and opposite for positive values.
     diff = abs(act) - abs(pred)  
     difference.append(diff)
     if (abs(act - pred) > serious):
