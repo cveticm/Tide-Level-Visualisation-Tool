@@ -1,6 +1,12 @@
+"""
+This script creates and manages the GUI for the Tide Level Visualisation tool.
+"""
+
+
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg) 
 import numpy as np
+import webbrowser
 
 import csv
 from datetime import datetime, timedelta
@@ -29,45 +35,18 @@ def resource_path(relative_path):
 height = 900
 width = 1650 * (900/1450)
 
-
-# from PIL import Image
-# size = (100/1650)*width, (100/1450)*height 
-# # FOR RESCALING IMAGES WITHOUT LOSING RES
-# im = Image.open("graphics/refs/tideloc.png")
-# im.thumbnail(size)
-# im.save("graphics/refs/tideloc1.png")
-# im = Image.open("graphics/refs/m2_loc.png")
-# im.thumbnail(size)
-# im.save("graphics/refs/m2_loc1.png")
-# im = Image.open("graphics/refs/airloc.png")
-# im.thumbnail(size)
-# im.save("graphics/refs/airloc1.png")
-# size = 200, 200
-# im = Image.open("graphics/refs/map.png")
-# im.thumbnail(size)
-# im.save("graphics/refs/map1.png")
-# size = (600/1650)*width, (600/1450)*height 
-# im = Image.open("graphics/refs/size_ref.png")
-# im.thumbnail(size)
-# im.save("graphics/refs/size_ref1.png")
-
-
 # Alignment parameters
 screen_edge = 10
 widget_x_edge = 800 +170 +10
 UI_x_edge = 1020+170 +20
-
 
 # Creating window
 root = Tk()
 geo = str(int(width))+'x'+str(int(height))
 root.geometry(geo)
 root.config(bg='white')
-# root.tk.call('tk', 'scaling', width)
 
-
-
-
+# Opening, reading, and storing information from data.csv into global variable data
 with open(resource_path('data\\data.csv'), 'r') as csv_file:
     reader = csv.reader(csv_file)
     data = []
@@ -77,14 +56,15 @@ with open(resource_path('data\\data.csv'), 'r') as csv_file:
     csv_file.close()
 
 def toggle():
+    # Adjusts text of toggle button.
     if toggle_button.config('text')[-1] == 'This Year':
         toggle_button.config(text='All Time')
     else:
         toggle_button.config(text='This Year')
     butnObj.toggleState()
 
-#TODO func takes dismiss since sliders want to give value to func. is there a more elegant solution to this then taking and dismissing a var?  
 def plotTide(dismiss):
+    # Gets slider values, parses throguh data storing relevant parameters and calls to all draw funcitons.
     date = timeSlide.get()
     res = resSlide.get()
     resolution = res//2
@@ -118,14 +98,16 @@ def plotTide(dismiss):
     wave_p = float(data[date][14])
     
     
-
+    # Call to redraw primary plot
     plotObj.update_plot(time, act, pred, resolution)
-    # Calling to functions to configure widgets of snapshot data
+    # Call to redraw environmental panel
     additional_param_canvas.canvasEditor(root, temp, wind_dir, wind_sp, press, moon, precip)
+    # Configure slider labels
     res_text = calcRes(res)
     curr_date_label.config(text=datetime.strptime(data[date][0], '%Y-%m-%d %H:%M:%S').strftime("%d %B %Y, %H:%M"))
     curr_res_label.config(text=res_text)
     
+    # Redraw wave plot
     if (((wave_p == 0) | (wave_p != wave_p)) & (wave_h != 0)):
         x = np.arange(0.0, 12, 0.1)
         wave_signal = wave_h*np.sin(((2 * np.pi)/(5)) * x)
@@ -169,7 +151,7 @@ def plotTide(dismiss):
         wave_plot.clear()
         
         
-        
+    # Collect actual tide level and corresponding storm infromation
     act_stormless = []
     n_stormless = []
     n_storm = []
@@ -192,7 +174,7 @@ def plotTide(dismiss):
             act_storm.append(float(data[date+i][11]))
             n_storm.append(i+720)
             new_time.append(datetime.strptime(data[i][0], '%Y-%m-%d %H:%M:%S').strftime("%d/%b/%Y"))
-
+    # Redraw scatter plot
     scatter_plot.scatter(n_stormless, act_stormless, s=.3, label='No Storm')
     scatter_plot.scatter(n_storm, act_storm, s=.3, label='Storm')
     scatter_plot.legend(loc="upper right", markerscale=10, fontsize=14)
@@ -210,6 +192,7 @@ def plotTide(dismiss):
     return 
 
 def calcRes(res):
+    # Takes zoom value and formats it into a string.
     text = ""
     months = res // 720
     days = (res % 720) // 24
@@ -222,12 +205,13 @@ def calcRes(res):
         text += str(hours) + " hrs"
     return text
 
+# Initialising primary panel
 plotObj = TidePlot(root, width, height)
 ref_img = PhotoImage(file=resource_path("graphics\\refs\\size_ref1.png"))
 height_ref_canvas = Canvas(root, width=(200/1650)*width, height=(800/1450)*height, bg='white')
 height_ref_canvas.place(x=(screen_edge/1650)*width, y=0)
 height_ref_canvas.create_image((300/1650)*width, (410/1450)*height, image=ref_img)
-
+# Initialising wave panel
 fig2 = plt.figure(figsize = ((4.3/1650)*width,(4.3/1450)*height), dpi = 100) 
 wave_plot_canvas = FigureCanvasTkAgg(fig2, master = root)   
 wave_plot_canvas.draw() 
@@ -240,6 +224,7 @@ wave_plot.set_ylabel('Height (m)', fontsize=10)
 wave_plot.set_xlabel('Period (s)', fontsize=10)
 wave_plot.set_ylim(-6,6)
 
+# Initialising scatter plot panel
 fig3 = plt.figure(figsize = ((4.3/1650)*width,(4.3/1450)*height), dpi = 100) 
 # adding the subplot 
 scatter_plot = fig3.add_subplot() 
@@ -251,7 +236,7 @@ scatter_plot_canvas.draw()
 # placing the canvas on the Tkinter window 
 scatter_plot_canvas.get_tk_widget().place(x=((screen_edge+500)/1650)*width,y=(1000/1450)*height) 
 
-# Creating sliders to navigate through time and zoom in and out
+# Initialising sliders to navigate through time and zoom in and out
 ### --- Time Slider --- ###
 slide_label = Label(root, text = 'Timeline', font='Ariel 12 bold', bg='white').place(x=(screen_edge/1650)*width, y=(820/1450)*height)
 timeSlide = Scale(root, from_=0, to=(len(data)-1), length=(950/1450)*height, width=(20/1650)*width, orient=HORIZONTAL, command=plotTide, showvalue=0, bg='white')
@@ -260,7 +245,7 @@ timeSlide.set(25)
 curr_date_label = Label(root, text='', font='Ariel 12', anchor="center", bg='white')
 curr_date_label.place(x=((screen_edge+450)/1650)*width, y=(880/1450)*height)
 
-### --- Resolution Slider --- ###
+### --- Resolution/Zoom Slider --- ###
 # Zooming is restricted between 2 days and approx 2 months (60 days)
 slide_label = Label(root, text = 'Zoom', font='Ariel 12 bold', bg='white').place(x=(screen_edge/1650)*width, y=(910/1450)*height)
 resSlide = Scale(root, from_=48, to=1440, length=(950/1450)*height, width=(20/1650)*width, orient=HORIZONTAL, command=plotTide, showvalue=0, bg='white')
@@ -269,6 +254,7 @@ curr_res_label = Label(root, text='2 days', font='Ariel 10', anchor="center", bg
 curr_res_label.place(x=((screen_edge+500)/1650)*width, y=(970/1450)*height)
 
 def setSlider(date, funct):
+    # Logic to call to relevant function while passing date.
     pos = date
     if funct == 0:
         pos = butnObj.hottest(date)
@@ -292,6 +278,7 @@ def setSlider(date, funct):
     timeSlide.set(pos)
 
 
+# Hover annotations for map buttons.
 # https://stackoverflow.com/questions/3221956/how-do-i-display-tooltips-in-tkinter
 class CreateToolTip(object):
     """
@@ -346,18 +333,20 @@ class CreateToolTip(object):
         if tw:
             tw.destroy()
 
+# Font sizes
 rf = 6
 btnfontsize= 10
 font= 'Arial ' + str(btnfontsize) + ' bold'
 btnwidth = 12
 btnheight = 3
 
+# Initialising 'Jump-To' buttons
 ### --- Jump to Buttons --- ###
 jumptofont='Arial ' + str(22-rf) + ' bold'
 jumptolabel = Label(root, text = 'Jump To', font=jumptofont, bg='white')
 button1_ttp = CreateToolTip(jumptolabel, 'Click these buttons to jump to the extreme days within the year you are on!')
 jumptolabel.place(x=(UI_x_edge/1650)*width, y=(30/1450)*height)
-
+# Toggle button
 toggle_button = Button(root, text="This Year", font=font,  width=10,height=1, command=toggle, bg='white')
 toggle_button.place(x=((UI_x_edge+200)/1650)*width,y=(35/1450)*height)
 butnObj = JumpToButtons(data)
@@ -389,8 +378,7 @@ storm_btn = Button(root, bg='white',  text='Closest Storm', font=font, command=l
 # storm_ttp = CreateToolTip(storm_btn, 'Jumps to the closest instance of a storm')
 storm_btn.place(x=(UI_x_edge/1650)*width, y=((760-180)/1450)*height)
 
-
-## --- Topographic Map --- ###
+# Initialising map panel
 Label(root, text = 'Map', font='Arial 14 bold', bg='white').place(x=(UI_x_edge/1650)*width, y=(850/1450)*height)
 map_canvas = Canvas(root, width=(300/1650)*width, height=(300/1450)*height, bg='grey')
 map_canvas.place(x=((UI_x_edge-20)/1650)*width, y=(900/1450)*height)
@@ -399,7 +387,6 @@ tidegauge_img=PhotoImage(file=resource_path("graphics\\refs\\tideloc1.png"))
 m2_img=PhotoImage(file=resource_path("graphics\\refs\\m2_loc1.png"))
 airport_img=PhotoImage(file=resource_path("graphics\\refs\\airloc1.png"))
 map_canvas.create_image((150/1650)*width, (150/1450)*height, image=map_img)
-
 
 tideg = Button(root, bg='white',  image=tidegauge_img, height=(100/1450)*height,width=(100/1650)*width)
 tideg_ttp=CreateToolTip(tideg, 'Tide Gauge location: This is where actual tidal height measurements have been taken')
@@ -413,43 +400,23 @@ airb = Button(root, bg='white',  image=airport_img, height=(100/1450)*height,wid
 airb_ttp=CreateToolTip(airb, 'Airport Weather Station location: This is where precipitation measurements have been taken')
 airb.place(x=((UI_x_edge+300)/1650)*width, y=((890+220)/1450)*height)
 
+# Initialising environmental panel
 ## --- Additional Parameters --- ###
 additional_param_canvas = CanvasEditor(width, height)
 additional_param_canvas.canvasCreator(root, (200/1650)*width, (widget_x_edge/1650)*width, (10/1450)*height)
 
+
+# Initialising 'About Data' frame
 about_frame = Frame(root, bg='white')
 
-# Create a frame for information
-info_frame = Frame(root, bg='white')
-info_frame.pack(fill=BOTH, expand=True)
-
-# Add labels or text widgets to describe the information
-info_label = Label(info_frame, text="Dublin Bay\nTide Visualisation", font=("Arial bold", 42), bg='white')
+# Initialising 'Introduction' frame
+intro_frame = Frame(root, bg='white')
+intro_frame.pack(fill=BOTH, expand=True)
+info_label = Label(intro_frame, text="Dublin Bay\nTide Visualisation", font=("Arial bold", 42), bg='white')
 info_label.pack(pady=50)
 
-def open_info_page(prev_frame):
-    info_frame = Frame(root, bg='white')
-    info_frame.pack(fill=BOTH, expand=True)
 
-    # Add labels or text widgets to describe the information
-    info_label = Label(info_frame, text="Dublin Bay\nTide Visualisation", font=("Arial", 24), bg='white')
-    info_label.pack(pady=20)
-    # Button to proceed to the main page
-    proceed_button = Button(info_frame, text="Start", command=open_main_page)
-    proceed_button.pack()
-    
-    # Button to proceed to the main page
-    about_button = Button(info_frame, text="About Data", command=open_about_page)
-    about_button.pack()
-
-    # Button to proceed to the main page
-    tutorial_button = Button(info_frame, text="Tutorial", command=open_tut_page)
-    tutorial_button.pack()
-        
-    prev_frame.destroy()
-
-import webbrowser
-
+# For displaying clickable links on frame.
 def open_met_link(event):
     webbrowser.open("https://www.met.ie/climate/available-data/historical-data")
 
@@ -459,15 +426,15 @@ def open_m2_link(event):
 def open_tide_link(event):
     webbrowser.open("https://erddap.marine.ie/erddap/tabledap/IrishNationalTideGaugeNetwork.csv?time%2Caltitude%2Clatitude%2Clongitude%2Cstation_id%2Cdatasourceid%2CWater_Level_LAT%2CWater_Level_OD_Malin%2CQC_Flag&time%3C=2024-03-10T13%3A18%3A45Z&station_id%3E=%22Dublin%20Port%22")
 
-# Function to open the main page
+
 def open_main_page():
-    # Destroy the info frame
-    info_frame.destroy()
+    # Function to reveal main frame
+    intro_frame.destroy()
     about_frame.destroy()
-    # Call the function to create and display the main page widgets
     
-    # Function to open the main page
+
 def open_about_page():
+    # Creates 'About Data' frame and destroys 'Introduction' frame.
     about_frame.pack(fill=BOTH, expand=True)
     title = Label(about_frame, text="About the Data", font=("Arial bold", 32), bg='white')
     title.place(x=(825/1650)*width, y= 75, anchor=CENTER)
@@ -491,43 +458,24 @@ def open_about_page():
     Label(about_frame, text='Predicted tidal heights have been taken by calculations done by a researcher at Trinity College Dublin', font=("Arial", 14), bg='white').place(x=(825/1650)*width, y= 450, anchor=CENTER)
     Label(about_frame, text='Storm dates have been taken from Met \u00c9ireann. As the current official naming convension for storms \nbegan in 2015, only storms from then onwards have been included.', font=("Arial", 14), bg='white').place(x=(825/1650)*width, y= 500, anchor=CENTER)
     Label(about_frame, text='In this tool, the \'Tide Height Data\' and \'Tidal Tracker: Storm Events & Data Outliers\' plots show data over a \nspan of time. All other widgets show readings from the hour you are on.', font=("Arial", 14), bg='white').place(x=(825/1650)*width, y= 600, anchor=CENTER)
-
-    
     
     proceed_button = Button(about_frame, text="Start", font=("Arial", 14), command=open_main_page, width=20, height=3)
     proceed_button.place(x=(825/1650)*width, y= 700, anchor=CENTER)
-    # Destroy the info frame
-    info_frame.destroy()
-    # Call the function to create and display the main page widgets
     
-    # Function to open the main page
-def open_tut_page():
-    # Create a frame for tutorial
-    tut_frame = Frame(root, bg='white')
-    tut_frame.pack(fill=BOTH, expand=True)
-    
-    info_label = Label(tut_frame, text="Tool Tutorial", font=("Arial", 24), bg='white')
-    info_label.pack(pady=20)
-
-    return_button = Button(tut_frame, text="Return", font=("Arial", 14), width=20, height=3, command=lambda:open_main_page(tut_frame))
-    return_button.pack()
     # Destroy the info frame
-    info_frame.destroy()
-    # Call the function to create and display the main page widgets
+    intro_frame.destroy()
 
 
-proceed_button = Button(info_frame, text="Start", font=("Arial", 14), width=20, height=3, command=open_main_page)
+proceed_button = Button(intro_frame, text="Start", font=("Arial", 14), width=20, height=3, command=open_main_page)
 proceed_button.pack(pady=10)
     
 # Button to proceed to the main page
-about_button = Button(info_frame, text="About Data", font=("Arial", 14), width=20, height=3, command=open_about_page)
+about_button = Button(intro_frame, text="About Data", font=("Arial", 14), width=20, height=3, command=open_about_page)
 about_button.pack()
 
-# # Button to proceed to the main page
-# tutorial_button = Button(info_frame, text="Tutorial", command=open_tut_page)
-# tutorial_button.pack()
 
 def on_closing():
+    # Ensure root is terminated on closing.
     root.destroy()
     exit()
 
