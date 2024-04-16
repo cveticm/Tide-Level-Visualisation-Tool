@@ -1,3 +1,9 @@
+"""
+This script contains all logic for the 'Jump-To' buttons, including 
+storing and parsing through data.
+"""
+
+
 from tkinter import *
 from datetime import datetime
 from dateutil.relativedelta import relativedelta 
@@ -5,13 +11,16 @@ import numpy as np
 class JumpToButtons():           
     def __init__(self, data):
         self.data = data
-        self.state = True # true state means calc yearly
+        self.state = True # Noting True means to calculate within the current year
         self.first_year = datetime.strptime(self.data[0][0], '%Y-%m-%d %H:%M:%S').year
         self.last_year = datetime.strptime(self.data[len(data)-1][0], '%Y-%m-%d %H:%M:%S').year
         tmp = []
         self.total=[]
         self.len=[0]
         curr_yr=int(self.first_year)
+        # Creating a list of data for a given year and appending it 
+        # to a list. This allows for easier navigation to yearly data
+        # when finding max/min/etc within the year.
         for i in range (0, len(data)-1):
             if int(datetime.strptime(self.data[i][0], '%Y-%m-%d %H:%M:%S').year) == curr_yr:
                 tmp.append(data[i])
@@ -23,9 +32,11 @@ class JumpToButtons():
         self.total.append(tmp)
     
     def toggleState(self):
+        # Change the state. Called to when toggle button is pressed.
         self.state = not self.state
     
     def get_year(self, date):
+        # Returns the currently selected year as the differencce between it and the first year.
         year = int(datetime.strptime(self.data[date][0], '%Y-%m-%d %H:%M:%S').year)
         return year - int(self.first_year)
     
@@ -36,13 +47,13 @@ class JumpToButtons():
             return pos_in_yr
         
     def hottest(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Returns the date of highest temperature.
         if self.state:
             pos = self.get_year(date)
-            data = self.total[pos]
+            data = self.total[pos] # Set data to only data from that year
         else:
             pos=0
-            data=self.data
+            data=self.data # Use all data
         max_pos = 0
         max_val = float(data[0][4])
         for i, entry in enumerate(data):
@@ -52,7 +63,7 @@ class JumpToButtons():
         return self.total_position(pos, max_pos)
     
     def coldest(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Returns the date of lowest temperature.
         if self.state:
             pos = self.get_year(date)
             data = self.total[pos]
@@ -70,7 +81,7 @@ class JumpToButtons():
         return self.total_position(pos, min_pos)
 
     def lowpress(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Returns the date of lowest atmospheric pressure.
         if self.state:
             pos = self.get_year(date)
             data = self.total[pos]
@@ -87,7 +98,7 @@ class JumpToButtons():
         return self.total_position(pos, min_pos)
     
     def rainy(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Returns the date of highest precipitation.
         if self.state:
             pos = self.get_year(date)
             data = self.total[pos]
@@ -103,7 +114,7 @@ class JumpToButtons():
         return self.total_position(pos, max_pos)
     
     def high_tide(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Returns the date of highest actual tide.
         if self.state:
             pos = self.get_year(date)
             data = self.total[pos]
@@ -119,7 +130,7 @@ class JumpToButtons():
         return self.total_position(pos, max_pos)
     
     def biggest_dif(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Returns the date of largest difference between actual and predicted tides.
         if self.state:
             pos = self.get_year(date)
             data = self.total[pos]
@@ -137,7 +148,7 @@ class JumpToButtons():
         return self.total_position(pos, max_pos)
     
     def high_wave(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Return the date of highest wave height.
         if self.state:
             pos = self.get_year(date)
             data = self.total[pos]
@@ -153,7 +164,7 @@ class JumpToButtons():
         return self.total_position(pos, max_pos)
     
     def strong_wind(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Return the date of highest wind speed.
         if self.state:
             pos = self.get_year(date)
             data = self.total[pos]
@@ -169,7 +180,7 @@ class JumpToButtons():
         return self.total_position(pos, max_pos)
     
     def up_down_search(self, start, iter):
-        # Search up and down an array. funciton is iteravely called until case is found.
+        # Search up and down an array. Funciton is iteravely called until case is found.
         if (start+iter <= len(self.data)):
             if (self.data[start+iter][15] != ''):
                 return (start+iter)
@@ -179,7 +190,7 @@ class JumpToButtons():
         return self.up_down_search(start, iter+1)
     
     def closest_storm(self, date):
-        # where date is the row number in date (ie the timeSlider value)
+        # Return the date of closest instance of a storm event.
         if date < 75800:
             date = 75800
         pos = date

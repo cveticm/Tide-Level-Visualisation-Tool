@@ -1,3 +1,8 @@
+"""
+This script creates a class TidePlot which creates and manages 
+plotting of tidal data in the primary panel.
+"""
+
 from tkinter import *
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,8 +25,9 @@ class TidePlot():
         self.ax2.tick_params(axis='y', labelcolor='white') # QUICK FIX to hide ax2 ticks
 
     def update_plot(self, time, act, pred, middle):
+        # Given new measurements, redraws the tidal plot.
         self.ax1.clear()
-        self.ax1.axvline(x=middle, color='k', alpha=0.5, linestyle='--', linewidth=2) #marking date we are currently on
+        self.ax1.axvline(x=middle, color='k', alpha=0.5, linestyle='--', linewidth=2) # Marking selected date
         self.line1, = self.ax1.plot(time, act, markevery=[middle], marker='.', markerfacecolor='k', markersize=15, label='Actual Tide')
         self.ax1.grid(True)
         self.line2, = self.ax1.plot(time, pred, color='red', label='Predicted Tide')
@@ -37,6 +43,8 @@ class TidePlot():
         self.ax1.fill_between(time, act, -3)
         self.plot_canvas.draw()
         
+        
+        # Hover annotations
         self.annots = []
         for ax in [self.ax1, self.ax2]:
             annot = self.ax1.annotate("", xy=(0,0), xytext=(-20,20),textcoords="offset points",
@@ -53,12 +61,14 @@ class TidePlot():
         return
 
     def update_annot(self, line, annot, ind):
+        # Prints hover annotations
         x,y = line.get_data()
         annot.xy = (x[ind["ind"][0]], y[ind["ind"][0]])
         text = "Date = {}\nTide Height= {:.2f}m".format((x[ind["ind"][0]]), y[ind["ind"][0]])
         annot.set_text(text)
 
     def hover(self, event):
+        # Detects if cursor hovers over a data point.
         if event.inaxes in [self.ax1, self.ax2]:
             for ax in [self.ax1, self.ax2]:
                 cont, ind = self.line_dic[ax].contains(event)

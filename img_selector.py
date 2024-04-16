@@ -1,3 +1,9 @@
+"""
+This script creates a class type CanvasEditor which creates and 
+manages the environemental panel graphics.
+"""
+
+
 from tkinter import *
 import sys
 import os
@@ -17,177 +23,7 @@ def resource_path(relative_path):
 class CanvasEditor():
     def __init__(self, width, height):
         self.height = height
-        self.width = width
-        # ### --- Graphics --- ###
-        # ## SNIPPET OF CODE IF NEEDED TO RESIZE IMAGES WITHOUT LOSING QUALITY
-        # from PIL import Image
-        # size = 125, 125
-        # # FOR RESCALING IMAGES WITHOUT LOSING RES
-        # im = Image.open("graphics/wind/1.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/11.png")
-
-        # im = Image.open("graphics/wind/2.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/21.png")
-
-        # im = Image.open("graphics/wind/3.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/31.png")
-
-        # im = Image.open("graphics/wind/4.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/41.png")
-
-        # im = Image.open("graphics/wind/5.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/51.png")
-
-        # im = Image.open("graphics/wind/6.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/61.png")
-
-        # im = Image.open("graphics/wind/7.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/71.png")
-
-        # im = Image.open("graphics/wind/8.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/81.png")
-
-        # im = Image.open("graphics/wind/9.png")
-        # im.thumbnail(size)
-        # im.save("graphics/wind/91.png")
-
-
-
-        # im = Image.open("graphics/temp/1.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/11.png")
-
-        # im = Image.open("graphics/temp/2.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/21.png")
-
-        # im = Image.open("graphics/temp/3.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/31.png")
-
-        # im = Image.open("graphics/temp/4.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/41.png")
-
-        # im = Image.open("graphics/temp/5.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/51.png")
-
-        # im = Image.open("graphics/temp/6.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/61.png")
-
-        # im = Image.open("graphics/temp/7.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/71.png")
-
-        # im = Image.open("graphics/temp/8.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/81.png")
-
-        # im = Image.open("graphics/temp/9.png")
-        # im.thumbnail(size)
-        # im.save("graphics/temp/91.png")
-
-
-        # im = Image.open("graphics/precip/1.png")
-        # im.thumbnail(size)
-        # im.save("graphics/precip/11.png")
-
-        # im = Image.open("graphics/precip/2.png")
-        # im.thumbnail(size)
-        # im.save("graphics/precip/21.png")
-
-        # im = Image.open("graphics/precip/3.png")
-        # im.thumbnail(size)
-        # im.save("graphics/precip/31.png")
-
-        # im = Image.open("graphics/precip/4.png")
-        # im.thumbnail(size)
-        # im.save("graphics/precip/41.png")
-
-        # im = Image.open("graphics/precip/5.png")
-        # im.thumbnail(size)
-        # im.save("graphics/precip/51.png")
-
-
-
-
-        # im = Image.open("graphics/press/1.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/11.png")
-
-        # im = Image.open("graphics/press/2.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/21.png")
-
-        # im = Image.open("graphics/press/3.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/31.png")
-
-        # im = Image.open("graphics/press/4.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/41.png")
-
-        # im = Image.open("graphics/press/5.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/51.png")
-
-        # im = Image.open("graphics/press/6.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/61.png")
-
-        # im = Image.open("graphics/press/7.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/71.png")
-
-        # im = Image.open("graphics/press/8.png")
-        # im.thumbnail(size)
-        # im.save("graphics/press/81.png")
-        
-        
-        
-        # im = Image.open("graphics/moon/1.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/11.png")
-
-        # im = Image.open("graphics/moon/2.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/21.png")
-
-        # im = Image.open("graphics/moon/3.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/31.png")
-
-        # im = Image.open("graphics/moon/4.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/41.png")
-
-        # im = Image.open("graphics/moon/5.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/51.png")
-
-        # im = Image.open("graphics/moon/6.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/61.png")
-
-        # im = Image.open("graphics/moon/7.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/71.png")
-
-        # im = Image.open("graphics/moon/8.png")
-        # im.thumbnail(size)
-        # im.save("graphics/moon/81.png")
-        
-        
+        self.width = width     
         
         
         # Loading in all images once
@@ -338,8 +174,10 @@ class CanvasEditor():
      
         
     def canvasCreator(self, root, canvas_width, x_coord, y_coord):
-        rf = 6
+        #Creates canva and initialises all widgets
         
+        # Font sizes
+        rf = 6
         tfont = 'Arial ' + str(18-rf) + ' bold'
         sfont = 'Arial ' + str(16-rf) + ' bold'
         
@@ -378,6 +216,7 @@ class CanvasEditor():
         self.precip_text =  self.myCanvas.create_text((canvas_width/2, self.betwicons*4+self.maintxt), text='mm', font='Arial 14 bold', fill='black')
 
     def canvasEditor(self, root, temp, wind_dir, wind_sp, press, moon_fullness, precip):
+        # Redraws all widgets given new data
         ### --- Temperature --- ###
         if (temp != temp):
             self.myCanvas.itemconfig(self.temp_text, text='Unknown')

@@ -21,9 +21,8 @@ import csv
 from datetime import datetime, timedelta
 import ephem
 
-######################################
-## ------ MOON FUNCTION BEGIN------ ##
-## CREDIT :: https://stackoverflow.com/questions/2526815/moon-lunar-phase-algorithm
+# Moon fullness calculation
+# CREDIT :: https://stackoverflow.com/questions/2526815/moon-lunar-phase-algorithm
 
 def get_phase_on_day(date: datetime):
   """Returns a floating-point number from 0-1. where 0=new, 0.5=full, 1=new"""
@@ -48,8 +47,6 @@ def get_phase_on_day(date: datetime):
   #percentage of the moon which is illuminated. This is not really what we want.
 
   return lunation
-## ------ MOON FUNCTION END------ ##
-####################################
 
 
 
@@ -217,4 +214,3 @@ with open('data\data.csv', 'w', newline='') as data:
         writer.writerow(row)
     csv_file.close()
     
-
